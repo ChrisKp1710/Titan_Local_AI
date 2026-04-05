@@ -1,1 +1,30 @@
-/target
+# --- Compilazione e Output ---
+# Cartella principale dove Rust salva i file compilati e gli eseguibili
+/target/
+
+# --- Dipendenze ---
+# Cargo.lock è opzionale per le librerie, ma CONSIGLIATO per i binari/eseguibili.
+# Se stai creando un'app finale, rimuovi il commento qui sotto:
+# Cargo.lock
+
+# --- File Temporanei e Log ---
+**/*.rs.bk
+rust-toolchain
+rust-toolchain.toml
+
+# --- IDE e Strumenti ---
+# Visual Studio Code
+.vscode/
+# IntelliJ / PyCharm / RustRover
+.idea/
+*.iml
+# File di swap di Vim
+[._]*.s[a-v][a-z]
+!*.svg
+# macOS
+.DS_Store
+
+# --- Variabili d'Ambiente ---
+# Evita di caricare dati sensibili (password, chiavi API)
+.env
+.env.local
