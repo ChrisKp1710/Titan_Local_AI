@@ -28,6 +28,9 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
+# Rilevamento Hardware: Configurazione corretta per 0.30
+sysinfo = { version = "0.30", default-features = false }
+
 # Inferenza: Binding per llama.cpp (sarà attivato pienamente nella Fase 2)
 # Nota: llama-cpp-2 richiede cmake installato nel sistema.
 llama-cpp-2 = { version = "0.1.41" }

@@ -28,27 +28,27 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
             
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.add_space(10.0);
-                render_resource_indicator(ui);
+                render_resource_indicator(ui, state);
                 ui.separator();
             });
         });
 }
 
 /// Indicatore di risorse e stato "Beast Mode"
-fn render_resource_indicator(ui: &mut egui::Ui) {
+fn render_resource_indicator(ui: &mut egui::Ui, state: &TitanAppState) {
     ui.vertical_centered(|ui| {
         ui.label(egui::RichText::new("RISORSE SISTEMA").strong().size(10.0));
         
-        // Simula indicatore VRAM/RAM
-        ui.add(egui::ProgressBar::new(0.65).text("RAM: 5.2GB / 8GB").desired_width(180.0));
+        // Visualizza RAM reale rilevata
+        let ram_text = format!("RAM: {:.1}GB Rilevati", state.total_ram_gb);
+        ui.add(egui::ProgressBar::new(0.5).text(ram_text).desired_width(180.0));
         
         ui.add_space(5.0);
         
-        // Placeholder Beast Mode (si attiva se hardware > 32GB)
-        let beast_mode = false; // Mock
-        if beast_mode {
-            ui.label(egui::RichText::new("🔥 BEAST MODE ACTIVE")
-                .color(egui::Color32::from_rgb(255, 100, 0))
+        // Attivazione dinamica Beast Mode
+        if state.is_high_end {
+            ui.label(egui::RichText::new("🚀 UNLEASHED / BEAST MODE")
+                .color(egui::Color32::from_rgb(255, 165, 0)) // Arancio Titan
                 .strong());
         } else {
             ui.label(egui::RichText::new("🧊 Eco-Mode (Standard)")

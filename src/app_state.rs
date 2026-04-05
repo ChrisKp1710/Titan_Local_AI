@@ -1,4 +1,3 @@
-use eframe::egui;
 use crossbeam_channel::{Receiver, Sender};
 
 /// Comandi inviati dalla UI verso l'Engine
@@ -24,16 +23,27 @@ pub struct TitanAppState {
     pub input_text: String,
     pub output_text: String,
     pub is_generating: bool,
+
+    // Dati Hardware
+    pub total_ram_gb: f32,
+    pub is_high_end: bool,
 }
 
 impl TitanAppState {
-    pub fn new(tx_to_engine: Sender<EngineCommand>, rx_from_engine: Receiver<EngineEvent>) -> Self {
+    pub fn new(
+        tx_to_engine: Sender<EngineCommand>, 
+        rx_from_engine: Receiver<EngineEvent>,
+        total_ram_gb: f32,
+        is_high_end: bool,
+    ) -> Self {
         Self {
             tx_to_engine,
             rx_from_engine,
             input_text: String::new(),
             output_text: String::new(),
             is_generating: false,
+            total_ram_gb,
+            is_high_end,
         }
     }
 }

@@ -1,8 +1,10 @@
 mod app_state;
 mod ui;
+mod engine;
 
 use app_state::{EngineCommand, EngineEvent, TitanAppState};
 use ui::main_window::TitanWindow;
+use engine::hardware_detect;
 use crossbeam_channel::{unbounded};
 use std::thread;
 use std::time::Duration;
@@ -11,7 +13,10 @@ fn main() -> anyhow::Result<()> {
     // 1. Configurazione Logger
     tracing_subscriber::fmt::init();
 
-    // 2. Creazione dei canali asincroni
+    // 2. Rilevamento Hardware Bare-Metal
+    let hw = hardware_detect::detect_hardware();
+
+    // 3. Creazione dei canali asincroni
     let (tx_to_engine, rx_from_ui) = unbounded::<EngineCommand>();
     let (tx_to_ui, rx_from_engine) = unbounded::<EngineEvent>();
 
@@ -50,12 +55,17 @@ fn main() -> anyhow::Result<()> {
     eframe::run_native(
         "Titan Local AI",
         options,
-        Box::new(|cc| {
+        Box::new(move |cc| {
             // Estetica Spartan: Dark Mode Forzata
             cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark());
             
             // Inizializzazione Window Modulare
-            let state = TitanAppState::new(tx_to_engine, rx_from_engine);
+            let state = TitanAppState::new(
+                tx_to_engine, 
+                rx_from_engine, 
+                hw.total_ram_gb, 
+                hw.is_high_end
+            );
             Box::new(TitanWindow::new(state))
         }),
     )
