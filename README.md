@@ -5,7 +5,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows_11-blue.svg)
 ![Graphics](https://img.shields.io/badge/Graphics-DXGI%20/%20DirectX-informational.svg)
 ![Performance](https://img.shields.io/badge/Performance-Beast_Mode-red.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![License](https://img.shields.io/badge/License-GPLv3-yellow.svg)
 
 ---
 
@@ -58,7 +58,7 @@ Siamo nel cuore della gestione della memoria. In questa fase stiamo implementand
 ---
 
 ## 📄 LICENZA
-Questo progetto è rilasciato sotto la licenza **MIT**. Consulta il file [LICENSE](LICENSE) per i termini completi.
+Questo progetto è rilasciato sotto la licenza **GPLv3**. Consulta il file [LICENSE](LICENSE) per i termini completi.
 
 ---
 
