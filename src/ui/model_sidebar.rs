@@ -41,14 +41,23 @@ fn render_resource_indicator(ui: &mut egui::Ui, state: &TitanAppState) {
         
         ui.add_space(5.0);
 
-        // Visualizzazione RAM e VRAM Formattata
+        // Visualizzazione RAM 
         ui.label(egui::RichText::new(format!(" {:.0} GB RAM", state.total_ram_gb)).strong());
+        ui.label(egui::RichText::new(&state.ram_model).size(9.0).color(egui::Color32::GRAY));
         
-        ui.add_space(2.0);
+        ui.add_space(4.0);
+
+        // Visualizzazione CPU
+        ui.label(egui::RichText::new(&state.cpu_name).small().color(egui::Color32::GRAY));
+        ui.label(egui::RichText::new(format!("󰻠 {}C / {}T", state.cpu_cores, state.cpu_threads)).strong());
+        if state.cpu_voltage > 0.1 {
+            ui.label(egui::RichText::new(format!("{:.2} V", state.cpu_voltage)).size(10.0));
+        }
+
+        ui.add_space(4.0);
         
-        // Forza la visualizzazione anche se il nome è generico
-        let display_gpu = if state.gpu_name.is_empty() { "GPU Rilevata" } else { &state.gpu_name };
-        ui.label(egui::RichText::new(display_gpu).small().color(egui::Color32::GRAY));
+        // Visualizzazione GPU
+        ui.label(egui::RichText::new(&state.gpu_name).small().color(egui::Color32::GRAY));
         ui.label(egui::RichText::new(format!("󰢮 {:.1} GB VRAM", state.vram_gb)).strong());
 
         ui.add_space(8.0);

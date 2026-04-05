@@ -64,8 +64,13 @@ fn main() -> anyhow::Result<()> {
                 tx_to_engine, 
                 rx_from_engine, 
                 hw.total_ram_gb, 
+                hw.ram_model.clone(),
                 hw.vram_gb, 
                 hw.gpu_name.clone(), 
+                hw.cpu_name.clone(),
+                hw.cpu_cores,
+                hw.cpu_threads,
+                hw.cpu_voltage,
                 hw.is_high_end
             );
             Box::new(TitanWindow::new(state))

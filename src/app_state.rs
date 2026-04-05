@@ -27,8 +27,13 @@ pub struct TitanAppState {
 
     // Dati Hardware
     pub total_ram_gb: f32,
+    pub ram_model: String,
     pub vram_gb: f32,
     pub gpu_name: String,
+    pub cpu_name: String,
+    pub cpu_cores: usize,
+    pub cpu_threads: usize,
+    pub cpu_voltage: f32,
     pub is_high_end: bool,
 }
 
@@ -37,8 +42,13 @@ impl TitanAppState {
         tx_to_engine: Sender<EngineCommand>, 
         rx_from_engine: Receiver<EngineEvent>,
         total_ram_gb: f32,
+        ram_model: String,
         vram_gb: f32,
         gpu_name: String,
+        cpu_name: String,
+        cpu_cores: usize,
+        cpu_threads: usize,
+        cpu_voltage: f32,
         is_high_end: bool,
     ) -> Self {
         Self {
@@ -48,8 +58,13 @@ impl TitanAppState {
             output_text: String::new(),
             is_generating: false,
             total_ram_gb,
+            ram_model,
             vram_gb,
             gpu_name,
+            cpu_name,
+            cpu_cores,
+            cpu_threads,
+            cpu_voltage,
             is_high_end,
         }
     }
