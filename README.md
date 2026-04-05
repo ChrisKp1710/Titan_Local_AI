@@ -9,11 +9,13 @@
 
 ---
 
-<div align="center">
+<p align="center">
   <img src="https://kodechris.dev/favicon.ico" width="48" height="48">
-  <h3>Developed by [Christian Koscielniak Pinto](https://kodechris.dev/)</h3>
-  <p><i>Zero Waste. Direct Access. Extreme Efficiency.</i></p>
-</div>
+  <br>
+  Developed by <a href="https://kodechris.dev/"><b>Christian Koscielniak Pinto</b></a>
+  <br>
+  <i>Zero Waste. Direct Access. Extreme Efficiency.</i>
+</p>
 
 ---
 
