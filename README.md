@@ -1,6 +1,11 @@
 # 🛸 TITAN LOCAL AI
 **Bare-Metal LLM Inference Engine | Build: Rust & DXGI**
 
+![Rust](https://img.shields.io/badge/Language-Rust-black?style=for-the-badge&logo=rust)
+![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows)
+![DirectX](https://img.shields.io/badge/Graphics-DXGI%20/%20DirectX-0078D4?style=for-the-badge&logo=microsoft)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
 Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non è solo un client, ma un manifesto di efficienza computazionale. Rifiutiamo l'overhead di Electron e la ridondanza dei processi in eccesso. Qui la RAM è gestita come una risorsa sacra e l'accesso all'hardware è diretto (Bare-Metal).
 
 ---
@@ -36,6 +41,11 @@ Siamo nel cuore della gestione della memoria. In questa fase stiamo implementand
 - **UI Framework**: `eframe` / `egui` (Backend GLOW)
 - **Concurrency**: `crossbeam-channel` (Asynchronous Message Passing)
 - **Direct System Access**: `windows-rs` (DXGI Interface), `sysinfo` (Selective Hardware Fetching)
+
+---
+
+## 📄 LICENZA
+Questo progetto è rilasciato sotto la licenza **MIT**. Consulta il file [LICENSE](LICENSE) per i termini completi.
 
 ---
 
