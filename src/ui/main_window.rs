@@ -20,12 +20,17 @@ impl TitanWindow {
                     self.state.output_text.push_str(&token);
                     ctx.request_repaint();
                 }
+                EngineEvent::ModelMetadataLoaded(report) => {
+                    self.state.output_text.push_str(&format!("\n[SYSTEM] {}\n", report));
+                    self.state.current_model = "Modello Attivo".to_string(); // Placeholder per ora
+                    ctx.request_repaint();
+                }
                 EngineEvent::Finished => {
                     self.state.is_generating = false;
                     ctx.request_repaint();
                 }
                 EngineEvent::Error(err) => {
-                    self.state.output_text.push_str(&format!("\nERRORE: {}", err));
+                    self.state.output_text.push_str(&format!("\n[ERROR] {}", err));
                     self.state.is_generating = false;
                 }
             }

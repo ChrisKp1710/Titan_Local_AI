@@ -1,6 +1,7 @@
 mod app_state;
 mod ui;
 mod engine;
+mod models; // Modulo per il parsing dell'header GGUF
 
 use app_state::{EngineCommand, EngineEvent, TitanAppState};
 use ui::main_window::TitanWindow;
@@ -36,6 +37,21 @@ fn main() -> anyhow::Result<()> {
                         }
                     }
                     let _ = tx_to_ui.send(EngineEvent::Finished);
+                }
+                EngineCommand::LoadModel(path) => {
+                    // Lettura fisica del file SOLO sull'Engine Thread
+                    match models::gguf_parser::parse_gguf_metadata(&path) {
+                        Ok(meta) => {
+                            let report = format!(
+                                "Dati GGUF: v{} | Tensors: {} | KV: {}",
+                                meta.version, meta.tensor_count, meta.metadata_kv_count
+                            );
+                            let _ = tx_to_ui.send(EngineEvent::ModelMetadataLoaded(report));
+                        }
+                        Err(e) => {
+                            let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore GGUF: {}", e)));
+                        }
+                    }
                 }
                 EngineCommand::Stop => {
                     tracing::warn!("Engine: Generazione interrotta");

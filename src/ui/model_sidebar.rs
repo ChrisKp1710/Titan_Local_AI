@@ -1,5 +1,5 @@
 use eframe::egui;
-use crate::app_state::TitanAppState;
+use crate::app_state::{TitanAppState, EngineCommand};
 
 /// La barra laterale sinistra per la gestione dei modelli e delle risorse.
 pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
@@ -14,7 +14,14 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
             
             // Bottone Caricamento
             if ui.button("📁 Carica GGUF").clicked() {
-                // Sarà implementato nella Fase 2
+                // Selettore file nativo (sincrono sulla UI thread, accettato dall'architettura)
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("GGUF Model", &["gguf"])
+                    .pick_file() 
+                {
+                    // Invio comando asincrono: il Main Thread non legge il file
+                    let _ = state.tx_to_engine.send(EngineCommand::LoadModel(path));
+                }
             }
             
             ui.add_space(20.0);

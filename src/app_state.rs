@@ -3,12 +3,14 @@ use crossbeam_channel::{Receiver, Sender};
 /// Comandi inviati dalla UI verso l'Engine
 pub enum EngineCommand {
     Generate(String),
+    LoadModel(std::path::PathBuf), // Il Main Thread invia solo il percorso
     Stop,
 }
 
 /// Eventi inviati dall'Engine verso la UI (Streaming)
 pub enum EngineEvent {
     NewToken(String),
+    ModelMetadataLoaded(String), // Report tecnico dell'Engine
     Finished,
     #[allow(dead_code)]
     Error(String),
@@ -34,6 +36,7 @@ pub struct TitanAppState {
     pub cpu_cores: usize,
     pub cpu_threads: usize,
     pub is_high_end: bool,
+    pub current_model: String, // Stato del modello caricato
 }
 
 impl TitanAppState {
@@ -63,6 +66,7 @@ impl TitanAppState {
             cpu_cores,
             cpu_threads,
             is_high_end,
+            current_model: "Nessun modello caricato".to_string(),
         }
     }
 }

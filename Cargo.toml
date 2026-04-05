@@ -38,6 +38,9 @@ windows = { version = "0.60", features = ["Win32_Foundation", "Win32_Graphics_Dx
 # Nota: llama-cpp-2 richiede cmake installato nel sistema.
 llama-cpp-2 = { version = "0.1.41" }
 
+# Selettore File Nativo: Zero overhead, solo dipendenze base.
+rfd = "0.14"
+
 [profile.release]
 opt-level = "z"      # Ottimizza per la dimensione del binario
 lto = true           # Link Time Optimization per eliminare codice morto
