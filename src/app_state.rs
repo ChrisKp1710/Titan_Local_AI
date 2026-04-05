@@ -33,7 +33,6 @@ pub struct TitanAppState {
     pub cpu_name: String,
     pub cpu_cores: usize,
     pub cpu_threads: usize,
-    pub cpu_voltage: f32,
     pub is_high_end: bool,
 }
 
@@ -48,7 +47,6 @@ impl TitanAppState {
         cpu_name: String,
         cpu_cores: usize,
         cpu_threads: usize,
-        cpu_voltage: f32,
         is_high_end: bool,
     ) -> Self {
         Self {
@@ -64,7 +62,6 @@ impl TitanAppState {
             cpu_name,
             cpu_cores,
             cpu_threads,
-            cpu_voltage,
             is_high_end,
         }
     }

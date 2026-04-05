@@ -70,7 +70,6 @@ fn main() -> anyhow::Result<()> {
                 hw.cpu_name.clone(),
                 hw.cpu_cores,
                 hw.cpu_threads,
-                hw.cpu_voltage,
                 hw.is_high_end
             );
             Box::new(TitanWindow::new(state))
