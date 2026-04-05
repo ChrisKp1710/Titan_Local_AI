@@ -1,10 +1,11 @@
 # 🛸 TITAN LOCAL AI
 **Bare-Metal LLM Inference Engine | Build: Rust & DXGI**
 
-![Rust](https://img.shields.io/badge/Language-Rust-black?style=for-the-badge&logo=rust)
-![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows)
-![DirectX](https://img.shields.io/badge/Graphics-DXGI%20/%20DirectX-0078D4?style=for-the-badge&logo=microsoft)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Language](https://img.shields.io/badge/Language-Rust-orange.svg)
+![Platform](https://img.shields.io/badge/Platform-Windows_11-blue.svg)
+![Graphics](https://img.shields.io/badge/Graphics-DXGI%20/%20DirectX-informational.svg)
+![Performance](https://img.shields.io/badge/Performance-Beast_Mode-red.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non è solo un client, ma un manifesto di efficienza computazionale. Rifiutiamo l'overhead di Electron e la ridondanza dei processi in eccesso. Qui la RAM è gestita come una risorsa sacra e l'accesso all'hardware è diretto (Bare-Metal).
 
@@ -14,7 +15,7 @@ Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non �
 ### [**Christian Koscielniak Pinto**](https://kodechris.dev/)
 *Frontend Developer & UI/UX Designer*
 
-[![Portfolio](https://img.shields.io/badge/Visit_Portfolio-kodechris.dev-black?style=for-the-badge&logo=googlechrome&logoColor=white)](https://kodechris.dev/)
+[![Portfolio](https://img.shields.io/badge/Visit_Portfolio-kodechris.dev-blue.svg?logo=googlechrome&logoColor=white)](https://kodechris.dev/)
 
 ---
 
