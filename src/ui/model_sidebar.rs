@@ -37,18 +37,24 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
 /// Indicatore di risorse e stato "Beast Mode"
 fn render_resource_indicator(ui: &mut egui::Ui, state: &TitanAppState) {
     ui.vertical_centered(|ui| {
-        ui.label(egui::RichText::new("RISORSE SISTEMA").strong().size(10.0));
-        
-        // Visualizza RAM reale rilevata
-        let ram_text = format!("RAM: {:.1}GB Rilevati", state.total_ram_gb);
-        ui.add(egui::ProgressBar::new(0.5).text(ram_text).desired_width(180.0));
+        ui.label(egui::RichText::new("HARDWARE DETECTED").strong().size(10.0));
         
         ui.add_space(5.0);
+
+        // Visualizzazione RAM e VRAM Formattata
+        ui.label(egui::RichText::new(format!(" {:.0} GB RAM", state.total_ram_gb)).strong());
         
-        // Attivazione dinamica Beast Mode
+        if !state.gpu_name.is_empty() && state.gpu_name != "Generic GPU" {
+            ui.label(egui::RichText::new(&state.gpu_name).small().color(egui::Color32::GRAY));
+            ui.label(egui::RichText::new(format!("󰢮 {:.0} GB VRAM", state.vram_gb)).strong());
+        }
+
+        ui.add_space(8.0);
+        
+        // Logica Dinamica: Mostra solo lo stato attivo
         if state.is_high_end {
             ui.label(egui::RichText::new("🚀 UNLEASHED / BEAST MODE")
-                .color(egui::Color32::from_rgb(255, 165, 0)) // Arancio Titan
+                .color(egui::Color32::from_rgb(255, 165, 0))
                 .strong());
         } else {
             ui.label(egui::RichText::new("🧊 Eco-Mode (Standard)")

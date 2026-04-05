@@ -26,6 +26,8 @@ pub struct TitanAppState {
 
     // Dati Hardware
     pub total_ram_gb: f32,
+    pub vram_gb: f32,
+    pub gpu_name: String,
     pub is_high_end: bool,
 }
 
@@ -34,6 +36,8 @@ impl TitanAppState {
         tx_to_engine: Sender<EngineCommand>, 
         rx_from_engine: Receiver<EngineEvent>,
         total_ram_gb: f32,
+        vram_gb: f32,
+        gpu_name: String,
         is_high_end: bool,
     ) -> Self {
         Self {
@@ -43,6 +47,8 @@ impl TitanAppState {
             output_text: String::new(),
             is_generating: false,
             total_ram_gb,
+            vram_gb,
+            gpu_name,
             is_high_end,
         }
     }
