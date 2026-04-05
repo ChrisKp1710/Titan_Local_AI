@@ -52,7 +52,6 @@ fn render_input_area(ctx: &egui::Context, ui: &mut egui::Ui, state: &mut TitanAp
             
             let _ = state.tx_to_engine.send(EngineCommand::Generate(state.input_text.clone()));
             state.input_text.clear();
-            
             ctx.request_repaint();
         }
 

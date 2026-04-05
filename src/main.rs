@@ -32,14 +32,13 @@ fn main() -> anyhow::Result<()> {
             match command {
                 EngineCommand::Generate(prompt) => {
                     tracing::info!("Engine: Ricevuto prompt '{}'", prompt);
-                    
-                    let tokens = vec!["Ciao,", "sono", "Titan", "AI.", "Il", "tuo", "carro", "armato", "di", "efficienza."];
-                    
-                    for token in tokens {
-                        thread::sleep(Duration::from_millis(150));
-                        if tx_to_ui.send(EngineEvent::NewToken(token.to_string() + " ")).is_err() {
-                            break;
+                    // Integrazione Reale (Fase 2 - Step 4)
+                    if let Some(runner) = &loaded_runner {
+                        if let Err(e) = runner.generate(&backend, &prompt, &tx_to_ui, &rx_from_ui) {
+                            let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore Generazione: {}", e)));
                         }
+                    } else {
+                        let _ = tx_to_ui.send(EngineEvent::Error("Nessun modello caricato!".to_string()));
                     }
                     let _ = tx_to_ui.send(EngineEvent::Finished);
                 }
