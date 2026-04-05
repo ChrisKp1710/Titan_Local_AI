@@ -7,15 +7,17 @@
 ![Performance](https://img.shields.io/badge/Performance-Beast_Mode-red.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non è solo un client, ma un manifesto di efficienza computazionale. Rifiutiamo l'overhead di Electron e la ridondanza dei processi in eccesso. Qui la RAM è gestita come una risorsa sacra e l'accesso all'hardware è diretto (Bare-Metal).
+---
+
+<div align="center">
+  <img src="https://kodechris.dev/favicon.ico" width="48" height="48">
+  <h3>Developed by [Christian Koscielniak Pinto](https://kodechris.dev/)</h3>
+  <p><i>Zero Waste. Direct Access. Extreme Efficiency.</i></p>
+</div>
 
 ---
 
-## 👨‍💻 DEVELOPED BY
-### [**Christian Koscielniak Pinto**](https://kodechris.dev/)
-*Frontend Developer & UI/UX Designer*
-
-[![Portfolio](https://img.shields.io/badge/Visit_Portfolio-kodechris.dev-blue.svg?logo=googlechrome&logoColor=white)](https://kodechris.dev/)
+Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non è solo un client, ma un manifesto di efficienza computazionale. Rifiutiamo l'overhead di Electron e la ridondanza dei processi in eccesso. Qui la RAM è gestita come una risorsa sacra e l'accesso all'hardware è diretto (Bare-Metal).
 
 ---
 
