@@ -10,6 +10,14 @@ Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non �
 
 ---
 
+## 👨‍💻 DEVELOPED BY
+### [**Christian Koscielniak Pinto**](https://kodechris.dev/)
+*Frontend Developer & UI/UX Designer*
+
+[![Portfolio](https://img.shields.io/badge/Visit_Portfolio-kodechris.dev-black?style=for-the-badge&logo=googlechrome&logoColor=white)](https://kodechris.dev/)
+
+---
+
 ## 🚦 STATO DEL PROGETTO
 | Fase | Titolo | Stato | Registro Tecnico |
 | :--- | :--- | :--- | :--- |
