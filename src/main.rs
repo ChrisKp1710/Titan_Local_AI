@@ -5,7 +5,8 @@ mod models; // Modulo per il parsing dell'header GGUF
 
 use app_state::{EngineCommand, EngineEvent, TitanAppState};
 use ui::main_window::TitanWindow;
-use engine::hardware_detect;
+use engine::{hardware_detect, llm_runner::LlamaRunner};
+use llama_cpp_2::llama_backend::LlamaBackend;
 use crossbeam_channel::{unbounded};
 use std::thread;
 use std::time::Duration;
@@ -23,6 +24,10 @@ fn main() -> anyhow::Result<()> {
 
     // 3. AVVIO DEL WORKER THREAD (Engine Mock)
     thread::spawn(move || {
+        // Inizializzazione Unica del Backend (Fase 2 - Step 3)
+        let backend = LlamaBackend::init().expect("ERRORE: Impossibile inizializzare llama.cpp backend");
+        let mut loaded_runner: Option<LlamaRunner> = None;
+
         while let Ok(command) = rx_from_ui.recv() {
             match command {
                 EngineCommand::Generate(prompt) => {
@@ -39,7 +44,7 @@ fn main() -> anyhow::Result<()> {
                     let _ = tx_to_ui.send(EngineEvent::Finished);
                 }
                 EngineCommand::LoadModel(path) => {
-                    // Lettura fisica del file SOLO sull'Engine Thread
+                    // 1. Parsing metadati veloce (Zero-Memory)
                     match models::gguf_parser::parse_gguf_metadata(&path) {
                         Ok(meta) => {
                             let report = format!(
@@ -47,9 +52,21 @@ fn main() -> anyhow::Result<()> {
                                 meta.version, meta.tensor_count, meta.metadata_kv_count
                             );
                             let _ = tx_to_ui.send(EngineEvent::ModelMetadataLoaded(report));
+
+                            // 2. Caricamento fisico dei PESI in VRAM (Beast Mode)
+                            tracing::info!("Engine: Caricamento pesi GGUF in VRAM...");
+                            match LlamaRunner::load(&backend, &path) {
+                                Ok(runner) => {
+                                    loaded_runner = Some(runner);
+                                    let _ = tx_to_ui.send(EngineEvent::ModelLoadedSuccess("Pesi caricati in VRAM. Pronto per l'inferenza.".to_string()));
+                                }
+                                Err(e) => {
+                                    let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore VRAM Load: {}", e)));
+                                }
+                            }
                         }
                         Err(e) => {
-                            let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore GGUF: {}", e)));
+                            let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore Header: {}", e)));
                         }
                     }
                 }

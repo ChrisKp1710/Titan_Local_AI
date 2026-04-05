@@ -25,6 +25,11 @@ impl TitanWindow {
                     self.state.current_model = "Modello Attivo".to_string(); // Placeholder per ora
                     ctx.request_repaint();
                 }
+                EngineEvent::ModelLoadedSuccess(msg) => {
+                    self.state.output_text.push_str(&format!("[SYSTEM] {}\n", msg));
+                    self.state.is_generating = false;
+                    ctx.request_repaint();
+                }
                 EngineEvent::Finished => {
                     self.state.is_generating = false;
                     ctx.request_repaint();

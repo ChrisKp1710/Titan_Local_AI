@@ -11,6 +11,7 @@ pub enum EngineCommand {
 pub enum EngineEvent {
     NewToken(String),
     ModelMetadataLoaded(String), // Report tecnico dell'Engine
+    ModelLoadedSuccess(String),  // Notifica caricamento pesi GGUF
     Finished,
     #[allow(dead_code)]
     Error(String),
