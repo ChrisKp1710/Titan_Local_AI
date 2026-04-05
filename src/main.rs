@@ -9,7 +9,6 @@ use engine::{hardware_detect, llm_runner::LlamaRunner};
 use llama_cpp_2::llama_backend::LlamaBackend;
 use crossbeam_channel::{unbounded};
 use std::thread;
-use std::time::Duration;
 
 fn main() -> anyhow::Result<()> {
     // 1. Configurazione Logger

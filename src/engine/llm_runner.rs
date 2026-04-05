@@ -43,7 +43,7 @@ impl LlamaRunner {
         // 3. Preparazione inferenza iniziale (Batching prompt)
         let mut batch = LlamaBatch::new(512, 1);
         for (i, &token) in tokens.iter().enumerate() {
-            batch.add(token, i as i32, &[0], i == tokens.len() - 1);
+            let _ = batch.add(token, i as i32, &[0], i == tokens.len() - 1);
         }
 
         // 4. Configurazione Sampler (Temp 0.8 / Top-K 40 / Top-P 0.95 via Chain)
@@ -70,8 +70,8 @@ impl LlamaRunner {
             }
 
             // 6. Conversione Real-time (Token -> String via Vec<u8>)
-            // Usiamo token_to_bytes per compatibilità stabile con 0.1.141
-            let bytes = self.model.token_to_bytes(token_id, llama_cpp_2::model::Special::Tokenize)
+            // Usiamo token_to_piece_bytes con firma (token, buf_len, special, max_bytes)
+            let bytes = self.model.token_to_piece_bytes(token_id, 32, false, None)
                 .map_err(|e| anyhow!("Errore conversione bytes: {:?}", e))?;
             
             let token_str = String::from_utf8_lossy(&bytes).to_string();
@@ -81,7 +81,7 @@ impl LlamaRunner {
 
             // 7. Preparazione batch per il token successivo
             batch.clear();
-            batch.add(token_id, n_cur, &[0], true);
+            let _ = batch.add(token_id, n_cur, &[0], true);
             n_cur += 1;
 
             ctx.decode(&mut batch).map_err(|e| anyhow!("Errore decoding loop: {:?}", e))?;

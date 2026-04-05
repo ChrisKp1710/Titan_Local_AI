@@ -1,0 +1,40 @@
+    Checking titan_ai v0.1.0 (C:\Users\chris\Documents\Epicode\script\Titan_Local_AI)
+warning: unused import: `std::time::Duration`
+  --> src\main.rs:12:5
+   |
+12 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated unit variant `llama_cpp_2::model::Special::Tokenize`: This enum is a mixture of options for llama cpp providing less flexibility it only used with deprecated methods and will be removed in the future.
+  --> src\engine\llm_runner.rs:74:96
+   |
+74 |             let bytes = self.model.token_to_piece_bytes(token_id, llama_cpp_2::model::Special::Tokenize)
+   |                                                                                                ^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+error[E0061]: this method takes 4 arguments but 2 arguments were supplied
+   --> src\engine\llm_runner.rs:74:36
+    |
+ 74 |             let bytes = self.model.token_to_piece_bytes(token_id, llama_cpp_2::model::Special::Tokenize)
+    |                                    ^^^^^^^^^^^^^^^^^^^^-------------------------------------------------
+    |                                                        |          |
+    |                                                        |          expected `usize`, found `Special`
+    |                                                        two arguments of type `bool` and `Option<NonZero<u16>>` are missing
+    |
+note: method defined here
+   --> C:\Users\chris\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\llama-cpp-2-0.1.141\src\model.rs:476:12
+    |
+476 |     pub fn token_to_piece_bytes(
+    |            ^^^^^^^^^^^^^^^^^^^^
+help: provide the arguments
+    |
+ 74 -             let bytes = self.model.token_to_piece_bytes(token_id, llama_cpp_2::model::Special::Tokenize)
+ 74 +             let bytes = self.model.token_to_piece_bytes(token_id, /* usize */, /* bool */, /* Option<NonZero<u16>> */)
+    |
+
+For more information about this error, try `rustc --explain E0061`.
+warning: `titan_ai` (bin "titan_ai") generated 2 warnings
+error: could not compile `titan_ai` (bin "titan_ai") due to 1 previous error; 2 warnings emitted
