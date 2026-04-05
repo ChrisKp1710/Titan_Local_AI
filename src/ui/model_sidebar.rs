@@ -23,8 +23,8 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
             // Lista modelli (Placeholder)
             ui.label("Modelli Locali:");
             ui.add_space(5.0);
-            ui.selectable_label(false, "• Mistral-7B-v0.3.gguf");
-            ui.selectable_label(false, "• Llama-3-8B-Q4.gguf");
+            ui.label("• Mistral-7B-v0.3.gguf");
+            ui.label("• Llama-3-8B-Q4.gguf");
             
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.add_space(10.0);
@@ -44,10 +44,12 @@ fn render_resource_indicator(ui: &mut egui::Ui, state: &TitanAppState) {
         // Visualizzazione RAM e VRAM Formattata
         ui.label(egui::RichText::new(format!(" {:.0} GB RAM", state.total_ram_gb)).strong());
         
-        if !state.gpu_name.is_empty() && state.gpu_name != "Generic GPU" {
-            ui.label(egui::RichText::new(&state.gpu_name).small().color(egui::Color32::GRAY));
-            ui.label(egui::RichText::new(format!("󰢮 {:.0} GB VRAM", state.vram_gb)).strong());
-        }
+        ui.add_space(2.0);
+        
+        // Forza la visualizzazione anche se il nome è generico
+        let display_gpu = if state.gpu_name.is_empty() { "GPU Rilevata" } else { &state.gpu_name };
+        ui.label(egui::RichText::new(display_gpu).small().color(egui::Color32::GRAY));
+        ui.label(egui::RichText::new(format!("󰢮 {:.1} GB VRAM", state.vram_gb)).strong());
 
         ui.add_space(8.0);
         

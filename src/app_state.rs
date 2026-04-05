@@ -10,6 +10,7 @@ pub enum EngineCommand {
 pub enum EngineEvent {
     NewToken(String),
     Finished,
+    #[allow(dead_code)]
     Error(String),
 }
 
