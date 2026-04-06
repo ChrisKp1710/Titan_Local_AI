@@ -38,6 +38,8 @@ windows = { version = "0.60", features = ["Win32_Foundation", "Win32_Graphics_Dx
 # Nota: llama-cpp-2 richiede cmake installato nel sistema.
 llama-cpp-2 = { version = "0.1.41", features = ["vulkan", "dynamic-link"] }
 
+# llama-cpp-2 = { version = "0.1.41" } # Senza accelerazione GPU
+
 # Selettore File Nativo: Zero overhead, solo dipendenze base.
 rfd = "0.14"
 
