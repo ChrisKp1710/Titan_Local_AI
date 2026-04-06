@@ -69,7 +69,7 @@ impl LlamaRunner {
             "max_tokens": 1024
         });
 
-        let mut response = self.client.post("http://127.0.0.1:8080/v1/chat/completions")
+        let response = self.client.post("http://127.0.0.1:8080/v1/chat/completions")
             .json(&payload)
             .send()
             .map_err(|e| anyhow!("Errore richiesta HTTP: {}", e))?;
