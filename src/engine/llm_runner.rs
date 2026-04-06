@@ -14,33 +14,34 @@ pub struct LlamaRunner {
 }
 
 impl LlamaRunner {
-    /// Avvia il server llama-server.exe in modalità invisibile e carica il modello.
+    /// Avvia il server llama-server.exe e carica il modello.
+    /// NOTA: CREATE_NO_WINDOW temporaneamente disabilitato per debug.
     pub fn load(path: &Path) -> Result<Self> {
-        // Flag per Windows: CREATE_NO_WINDOW (0x08000000)
-        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        // const CREATE_NO_WINDOW: u32 = 0x08000000; // Commentato per visibilità diagnosi
 
-        tracing::info!("LlamaRunner: Avviando server invisibile per {:?}", path);
+        tracing::info!("LlamaRunner: Avviando server per {:?}", path);
 
         let child = Command::new("engine/llama-server.exe")
             .arg("-m")
             .arg(path)
             .arg("-ngl")
-            .arg("99") // Forza GPU
+            .arg("99") // Offload totale GPU
             .arg("--port")
             .arg("8080")
             .arg("-c")
-            .arg("4096") // Context size
-            .creation_flags(CREATE_NO_WINDOW)
+            .arg("4096")
+            .arg("--alias")
+            .arg("model_1")
+            // .creation_flags(CREATE_NO_WINDOW) // Commentato per visibilità diagnosi
             .spawn()
             .map_err(|e| anyhow!("Impossibile avviare llama-server.exe: {}", e))?;
 
         let client = reqwest::blocking::Client::new();
 
-        // Polling /health (Fase 2 - Client-Server)
-        // Aspettiamo che il server sia pronto e la VRAM caricata
+        // Polling /health esteso a 120 secondi per modelli pesanti (es. Qwen 35B)
         let mut ready = false;
-        for i in 0..30 { // Timeout 30 secondi
-            tracing::info!("LlamaRunner: Polling /health (tentativo {}/30)...", i + 1);
+        for i in 0..120 { 
+            tracing::info!("LlamaRunner: Polling /health (tentativo {}/120)...", i + 1);
             if let Ok(resp) = client.get("http://127.0.0.1:8080/health").send() {
                 if resp.status().is_success() {
                     ready = true;
