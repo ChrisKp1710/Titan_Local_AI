@@ -34,9 +34,9 @@ sysinfo = { version = "0.30", default-features = false }
 # API Native Windows per DXGI (GPU Bare-Metal)
 windows = { version = "0.60", features = ["Win32_Foundation", "Win32_Graphics_Dxgi"] }
 
-# Inferenza: Binding per llama.cpp (sarà attivato pienamente nella Fase 2)
+# Inferenza: Binding per llama.cpp con accelerazione VULKAN attivata per GPU AMD
 # Nota: llama-cpp-2 richiede cmake installato nel sistema.
-llama-cpp-2 = { version = "0.1.41" }
+llama-cpp-2 = { version = "0.1.41", features = ["vulkan", "dynamic-link"] }
 
 # Selettore File Nativo: Zero overhead, solo dipendenze base.
 rfd = "0.14"
