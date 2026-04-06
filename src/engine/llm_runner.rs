@@ -1,92 +1,111 @@
-use llama_cpp_2::model::LlamaModel;
-use llama_cpp_2::model::params::LlamaModelParams;
-use llama_cpp_2::context::params::LlamaContextParams;
-use llama_cpp_2::llama_batch::LlamaBatch;
-use llama_cpp_2::sampling::LlamaSampler;
-use llama_cpp_2::llama_backend::LlamaBackend;
 use crate::app_state::{EngineEvent, EngineCommand};
 use crossbeam_channel::{Sender, Receiver};
 use std::path::Path;
+use std::process::{Command, Child};
+use std::os::windows::process::CommandExt;
+use std::time::Duration;
+use std::io::{BufRead, BufReader};
 use anyhow::{Result, anyhow};
+use serde_json::json;
 
 pub struct LlamaRunner {
-    pub model: LlamaModel,
+    pub child: Child,
+    pub client: reqwest::blocking::Client,
 }
 
 impl LlamaRunner {
-    /// Carica i pesi del modello in VRAM con offloading totale (GPU AMD Radeon RX 7900 XTX).
-    pub fn load(backend: &LlamaBackend, path: &Path) -> Result<Self> {
-        let params = LlamaModelParams::default()
-            .with_n_gpu_layers(999) 
-            .with_use_mmap(true);
-        
-        let model = LlamaModel::load_from_file(backend, path, &params)
-            .map_err(|e| anyhow!("Errore caricamento modello GGUF: {:?}", e))?;
-            
-        Ok(Self { model })
-    }
+    /// Avvia il server llama-server.exe in modalità invisibile e carica il modello.
+    pub fn load(path: &Path) -> Result<Self> {
+        // Flag per Windows: CREATE_NO_WINDOW (0x08000000)
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
 
-    /// Genera testo in tempo reale con streaming a latenza zero.
-    pub fn generate(&self, backend: &LlamaBackend, prompt: &str, tx: &Sender<EngineEvent>, rx: &Receiver<EngineCommand>) -> Result<()> {
-        // 1. Inizializzazione Contesto (n_ctx = 4096 tokens per Beast Mode)
-        let ctx_params = LlamaContextParams::default()
-            .with_n_ctx(std::num::NonZeroU32::new(4096));
-        
-        let mut ctx = self.model.new_context(backend, ctx_params)
-            .map_err(|e| anyhow!("Errore creazione contesto: {:?}", e))?;
+        tracing::info!("LlamaRunner: Avviando server invisibile per {:?}", path);
 
-        // 2. Tokenizzazione del Prompt
-        let formatted_prompt = format!("\nUser: {}\nTitan: ", prompt);
-        let tokens = self.model.str_to_token(&formatted_prompt, llama_cpp_2::model::AddBos::Always)
-            .map_err(|e| anyhow!("Errore tokenizzazione: {:?}", e))?;
+        let child = Command::new("engine/llama-server.exe")
+            .arg("-m")
+            .arg(path)
+            .arg("-ngl")
+            .arg("99") // Forza GPU
+            .arg("--port")
+            .arg("8080")
+            .arg("-c")
+            .arg("4096") // Context size
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn()
+            .map_err(|e| anyhow!("Impossibile avviare llama-server.exe: {}", e))?;
 
-        // 3. Preparazione inferenza iniziale (Batching prompt)
-        let mut batch = LlamaBatch::new(512, 1);
-        for (i, &token) in tokens.iter().enumerate() {
-            let _ = batch.add(token, i as i32, &[0], i == tokens.len() - 1);
+        let client = reqwest::blocking::Client::new();
+
+        // Polling /health (Fase 2 - Client-Server)
+        // Aspettiamo che il server sia pronto e la VRAM caricata
+        let mut ready = false;
+        for i in 0..30 { // Timeout 30 secondi
+            tracing::info!("LlamaRunner: Polling /health (tentativo {}/30)...", i + 1);
+            if let Ok(resp) = client.get("http://127.0.0.1:8080/health").send() {
+                if resp.status().is_success() {
+                    ready = true;
+                    break;
+                }
+            }
+            std::thread::sleep(Duration::from_secs(1));
         }
 
-        // 4. Configurazione Sampler (Temp 0.8 / Top-K 40 / Top-P 0.95 via Chain)
-        let mut sampler = LlamaSampler::chain_simple([
-            LlamaSampler::temp(0.8),
-        ]);
+        if !ready {
+            return Err(anyhow!("Il server llama-server non ha risposto in tempo utile."));
+        }
 
-        let mut n_cur = tokens.len() as i32;
-        ctx.decode(&mut batch).map_err(|e| anyhow!("Errore decoding prompt: {:?}", e))?;
+        tracing::info!("LlamaRunner: Server pronto e VRAM carica.");
+        Ok(Self { child, client })
+    }
 
-        loop {
-            // Verifica interruzione utente (STOP Command)
+    /// Genera testo tramite API HTTP (OpenAI Compatible) con streaming.
+    pub fn generate(&self, prompt: &str, tx: &Sender<EngineEvent>, rx: &Receiver<EngineCommand>) -> Result<()> {
+        let payload = json!({
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "stream": true,
+            "temperature": 0.7,
+            "max_tokens": 1024
+        });
+
+        let mut response = self.client.post("http://127.0.0.1:8080/v1/chat/completions")
+            .json(&payload)
+            .send()
+            .map_err(|e| anyhow!("Errore richiesta HTTP: {}", e))?;
+
+        let reader = BufReader::new(response);
+
+        for line in reader.lines() {
+            // Verifica STOP (Fase 2 - Step 4)
             if let Ok(EngineCommand::Stop) = rx.try_recv() {
+                tracing::warn!("LlamaRunner: Ricevuto comando STOP durante streaming.");
                 break;
             }
 
-            // 5. Campionamento (Firma 0.1.141 - richiede contesto e indice token nel batch)
-            let idx = batch.n_tokens() - 1;
-            let token_id = sampler.sample(&ctx, idx);
-            
-            // Controllo fine generazione
-            if self.model.is_eog_token(token_id) {
-                break;
+            let line = line.map_err(|e| anyhow!("Errore lettura stream: {}", e))?;
+            if line.is_empty() { continue; }
+            if line == "data: [DONE]" { break; }
+
+            if let Some(stripped) = line.strip_prefix("data: ") {
+                if let Ok(val) = serde_json::from_str::<serde_json::Value>(stripped) {
+                    if let Some(content) = val["choices"][0]["delta"]["content"].as_str() {
+                        let _ = tx.send(EngineEvent::NewToken(content.to_string()));
+                    }
+                }
             }
-
-            // 6. Conversione Real-time (Token -> String via Vec<u8>)
-            // Usiamo token_to_piece_bytes con firma (token, buf_len, special, max_bytes)
-            let bytes = self.model.token_to_piece_bytes(token_id, 32, false, None)
-                .map_err(|e| anyhow!("Errore conversione bytes: {:?}", e))?;
-            
-            let token_str = String::from_utf8_lossy(&bytes).to_string();
-            
-            // Streaming immediato alla UI per effetto "scrittura viva"
-            let _ = tx.send(EngineEvent::NewToken(token_str));
-
-            // 7. Preparazione batch per il token successivo
-            batch.clear();
-            let _ = batch.add(token_id, n_cur, &[0], true);
-            n_cur += 1;
-
-            ctx.decode(&mut batch).map_err(|e| anyhow!("Errore decoding loop: {:?}", e))?;
         }
 
         Ok(())
+    }
+}
+
+/// Implementazione Drop: Stermina il processo zombie alla chiusura di Titan AI.
+impl Drop for LlamaRunner {
+    fn drop(&mut self) {
+        tracing::warn!("LlamaRunner: Terminazione llama-server.exe per rilascio VRAM...");
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+        tracing::info!("LlamaRunner: VRAM rilasciata correttamente.");
     }
 }

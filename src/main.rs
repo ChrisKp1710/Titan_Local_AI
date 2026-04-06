@@ -6,7 +6,6 @@ mod models; // Modulo per il parsing dell'header GGUF
 use app_state::{EngineCommand, EngineEvent, TitanAppState};
 use ui::main_window::TitanWindow;
 use engine::{hardware_detect, llm_runner::LlamaRunner};
-use llama_cpp_2::llama_backend::LlamaBackend;
 use crossbeam_channel::{unbounded};
 use std::thread;
 
@@ -21,19 +20,17 @@ fn main() -> anyhow::Result<()> {
     let (tx_to_engine, rx_from_ui) = unbounded::<EngineCommand>();
     let (tx_to_ui, rx_from_engine) = unbounded::<EngineEvent>();
 
-    // 3. AVVIO DEL WORKER THREAD (Engine Mock)
+    // 3. AVVIO DEL WORKER THREAD (Engine Invisibile)
     thread::spawn(move || {
-        // Inizializzazione Unica del Backend (Fase 2 - Step 3)
-        let backend = LlamaBackend::init().expect("ERRORE: Impossibile inizializzare llama.cpp backend");
         let mut loaded_runner: Option<LlamaRunner> = None;
 
         while let Ok(command) = rx_from_ui.recv() {
             match command {
                 EngineCommand::Generate(prompt) => {
                     tracing::info!("Engine: Ricevuto prompt '{}'", prompt);
-                    // Integrazione Reale (Fase 2 - Step 4)
                     if let Some(runner) = &loaded_runner {
-                        if let Err(e) = runner.generate(&backend, &prompt, &tx_to_ui, &rx_from_ui) {
+                        // Generazione via HTTP (Fase 2 - Client-Server)
+                        if let Err(e) = runner.generate(&prompt, &tx_to_ui, &rx_from_ui) {
                             let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore Generazione: {}", e)));
                         }
                     } else {
@@ -51,15 +48,15 @@ fn main() -> anyhow::Result<()> {
                             );
                             let _ = tx_to_ui.send(EngineEvent::ModelMetadataLoaded(report));
 
-                            // 2. Caricamento fisico dei PESI in VRAM (Beast Mode)
-                            tracing::info!("Engine: Caricamento pesi GGUF in VRAM...");
-                            match LlamaRunner::load(&backend, &path) {
+                            // 2. Avvio del Server invisibile e caricamento VRAM
+                            tracing::info!("Engine: Avvio llama-server.exe in background...");
+                            match LlamaRunner::load(&path) {
                                 Ok(runner) => {
                                     loaded_runner = Some(runner);
-                                    let _ = tx_to_ui.send(EngineEvent::ModelLoadedSuccess("Pesi caricati in VRAM. Pronto per l'inferenza.".to_string()));
+                                    let _ = tx_to_ui.send(EngineEvent::ModelLoadedSuccess("Motore pronto: llama-server attivo in background.".to_string()));
                                 }
                                 Err(e) => {
-                                    let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore VRAM Load: {}", e)));
+                                    let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore Avvio Server: {}", e)));
                                 }
                             }
                         }
