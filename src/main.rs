@@ -26,11 +26,11 @@ fn main() -> anyhow::Result<()> {
 
         while let Ok(command) = rx_from_ui.recv() {
             match command {
-                EngineCommand::Generate(prompt) => {
-                    tracing::info!("Engine: Ricevuto prompt '{}'", prompt);
+                EngineCommand::Generate { prompt, temperature, max_tokens } => {
+                    tracing::info!("Engine: Ricevuto prompt '{}' (temp: {}, tokens: {})", prompt, temperature, max_tokens);
                     if let Some(runner) = &loaded_runner {
-                        // Generazione via HTTP (Fase 2 - Client-Server)
-                        if let Err(e) = runner.generate(&prompt, &tx_to_ui, &rx_from_ui) {
+                        // Generazione dinamica via HTTP (Fase 2 - Client-Server)
+                        if let Err(e) = runner.generate(&prompt, temperature, max_tokens, &tx_to_ui, &rx_from_ui) {
                             let _ = tx_to_ui.send(EngineEvent::Error(format!("Errore Generazione: {}", e)));
                         }
                     } else {

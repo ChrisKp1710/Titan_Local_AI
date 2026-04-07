@@ -54,9 +54,11 @@ fn render_input_area(ctx: &egui::Context, ui: &mut egui::Ui, state: &mut TitanAp
             state.output_text.push_str(&state.input_text);
             state.output_text.push_str("\nTITAN: ");
 
-            let _ = state
-                .tx_to_engine
-                .send(EngineCommand::Generate(state.input_text.clone()));
+            let _ = state.tx_to_engine.send(EngineCommand::Generate {
+                prompt: state.input_text.clone(),
+                temperature: state.temperature,
+                max_tokens: state.max_tokens,
+            });
             state.input_text.clear();
             ctx.request_repaint();
         }

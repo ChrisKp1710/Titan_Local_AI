@@ -59,15 +59,14 @@ impl LlamaRunner {
         Ok(Self { child, client })
     }
 
-    /// Genera testo tramite API HTTP (OpenAI Compatible) con streaming.
-    pub fn generate(&self, prompt: &str, tx: &Sender<EngineEvent>, rx: &Receiver<EngineCommand>) -> Result<()> {
+    pub fn generate(&self, prompt: &str, temperature: f32, max_tokens: u32, tx: &Sender<EngineEvent>, rx: &Receiver<EngineCommand>) -> Result<()> {
         let payload = json!({
             "messages": [
                 {"role": "user", "content": prompt}
             ],
             "stream": true,
-            "temperature": 0.7,
-            "max_tokens": 1024
+            "temperature": temperature,
+            "max_tokens": max_tokens
         });
 
         let response = self.client.post("http://127.0.0.1:8080/v1/chat/completions")

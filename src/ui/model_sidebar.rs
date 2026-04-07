@@ -27,11 +27,18 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
             ui.add_space(20.0);
             ui.separator();
             
-            // Lista modelli (Placeholder)
-            ui.label("Modelli Locali:");
-            ui.add_space(5.0);
-            ui.label("• Mistral-7B-v0.3.gguf");
-            ui.label("• Llama-3-8B-Q4.gguf");
+            // Nuova sezione: Parametri Inferenza (Fase 2)
+            egui::CollapsingHeader::new("⚙ Parametri Inferenza")
+                .default_open(true)
+                .show(ui, |ui| {
+                    ui.add_space(5.0);
+                    ui.label("Temperatura:");
+                    ui.add(egui::Slider::new(&mut state.temperature, 0.1..=2.0).step_by(0.1));
+                    
+                    ui.add_space(5.0);
+                    ui.label("Max Tokens:");
+                    ui.add(egui::Slider::new(&mut state.max_tokens, 128..=8192).step_by(128.0));
+                });
             
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.add_space(10.0);

@@ -2,16 +2,20 @@ use crossbeam_channel::{Receiver, Sender};
 
 /// Comandi inviati dalla UI verso l'Engine
 pub enum EngineCommand {
-    Generate(String),
-    LoadModel(std::path::PathBuf), // Il Main Thread invia solo il percorso
+    Generate {
+        prompt: String,
+        temperature: f32,
+        max_tokens: u32,
+    },
+    LoadModel(std::path::PathBuf),
     Stop,
 }
 
 /// Eventi inviati dall'Engine verso la UI (Streaming)
 pub enum EngineEvent {
     NewToken(String),
-    ModelMetadataLoaded(String), // Report tecnico dell'Engine
-    ModelLoadedSuccess(String),  // Notifica caricamento pesi GGUF
+    ModelMetadataLoaded(String),
+    ModelLoadedSuccess(String),
     Finished,
     #[allow(dead_code)]
     Error(String),
@@ -28,6 +32,10 @@ pub struct TitanAppState {
     pub output_text: String,
     pub is_generating: bool,
 
+    // Parametri di Inferenza (Fase 2 - Step 5)
+    pub temperature: f32,
+    pub max_tokens: u32,
+
     // Dati Hardware
     pub total_ram_gb: f32,
     pub ram_model: String,
@@ -37,7 +45,7 @@ pub struct TitanAppState {
     pub cpu_cores: usize,
     pub cpu_threads: usize,
     pub is_high_end: bool,
-    pub current_model: String, // Stato del modello caricato
+    pub current_model: String,
 }
 
 impl TitanAppState {
@@ -59,6 +67,9 @@ impl TitanAppState {
             input_text: String::new(),
             output_text: String::new(),
             is_generating: false,
+            // Default di fabbrica per Titan AI
+            temperature: 0.7,
+            max_tokens: 1024,
             total_ram_gb,
             ram_model,
             vram_gb,
