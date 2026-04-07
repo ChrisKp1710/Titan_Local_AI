@@ -27,17 +27,27 @@ Benvenuto nel portale di sviluppo di **Titan Local AI**. Questo repository non �
 | Fase | Titolo | Stato | Registro Tecnico |
 | :--- | :--- | :--- | :--- |
 | **01** | **Lo Scheletro (UI & Threading)** | `✅ COMPLETATA` | [FASE1.md](FASE1.md) |
-| **02** | **GGUF Loader & Memory MMap** | `🏗️ IN CORSO` | *In fase di stesura* |
-| **03** | **Llama.cpp Integration** | `⏳ PIANIFICATA` | - |
-| **04** | **Beast Mode Optimizations** | `⏳ PIANIFICATA` | - |
+| **02** | **Engine Client-Server & GPU Offload** | `✅ COMPLETATA` | [FASE_2_COMPLETATA.md](FASE_2_COMPLETATA.md) |
+| **03** | **Streaming Asincrono & Reasoning Parser** | `🏗️ IN CORSO` | *In fase di sviluppo* |
+| **04** | **Chat History & UI Refinement** | `⏳ PIANIFICATA` | - |
 
 ---
 
-## 🏗️ CANTIERE ATTUALE: FASE 2
-Siamo nel cuore della gestione della memoria. In questa fase stiamo implementando:
-- **Native File Dialog**: Integrazione tramite `rfd` per un'esperienza desktop coerente.
-- **GGUF Parser**: Accesso istantaneo all'header e ai metadati del modello.
-- **Memory Mapping**: Mapping virtuale dei file tramite `memmap2` per caricamenti a latenza zero.
+## ✅ TRAGUARDI RAGGIUNTI: FASE 2
+Abbiamo consolidato il cuore pulsante di Titan:
+- [x] **Integrazione Motore IA**: Migrazione riuscita verso `llama-server.exe`.
+- [x] **Architettura Client-Server**: Comunicazione HTTP RESTful isolata e sicura.
+- [x] **Offload GPU Totale**: Supporto Vulkan per GPU AMD (RX 7900 XTX).
+- [x] **Gestione VRAM**: Implementazione del tratto `Drop` e tasto "Spegni Motore" per pulizia istantanea.
+- [x] **Inference Sliders**: Controllo dinamico di Temperatura e Max Tokens dalla UI.
+
+---
+
+## 🏗️ CANTIERE ATTUALE: FASE 3
+Obiettivi prioritari per l'ottimizzazione dell'esperienza utente:
+- **Streaming Zero-Latency Reale**: Migrazione a uno stream asincrono a basso livello per eliminare ogni micro-freeze della UI durante l'inferenza di modelli massicci (35B+).
+- **Parser "Reasoning" (LM Studio Style)**: Logica di intercettazione dei tag `<think>...</think>`. Visualizzazione dinamica del pensiero del modello (corsivo grigio) con sistema di auto-collasso alla ricezione della risposta finale.
+- **Persistent Chat History**: Salvataggio locale delle sessioni di chat.
 
 ---
 
@@ -45,20 +55,21 @@ Siamo nel cuore della gestione della memoria. In questa fase stiamo implementand
 1. **Direct Access**: Se esiste un'API di sistema, la usiamo preferendola a qualsiasi wrapper.
 2. **Deterministic UI**: L'interfaccia non deve mai attendere l'Engine. 60fps garantiti.
 3. **Zero Waste**: Ogni byte di RAM deve essere giustificato.
-4. **Extreme Modularity**: Moduli piccoli, sicuri e focalizzati (Filosofia "Titan").
+4. **Extreme Modularity**: Moduli piccoli, sicuri e focalizzati.
 
 ---
 
-## 🛠️ STACK TECNOLOGICO (V1.0)
+## 🛠️ STACK TECNOLOGICO (V1.2)
 - **Core Logic**: Rust 1.75+
-- **UI Framework**: `eframe` / `egui` (Backend GLOW)
-- **Concurrency**: `crossbeam-channel` (Asynchronous Message Passing)
-- **Direct System Access**: `windows-rs` (DXGI Interface), `sysinfo` (Selective Hardware Fetching)
+- **Inference Server**: Llama.cpp (Vulkan Backend)
+- **Networking**: `reqwest` (HTTP/1.1 Streaming)
+- **UI Framework**: `eframe` / `egui` (GLOW Backend)
+- **Monitoring**: `sysinfo`, `windows-rs` (DXGI Interface)
 
 ---
 
 ## 📄 LICENZA
-Questo progetto è rilasciato sotto la licenza **GPLv3**. Consulta il file [LICENSE](LICENSE) per i termini completi.
+Questo progetto è rilasciato sotto la licenza **GPLv3**.
 
 ---
 
