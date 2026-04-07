@@ -74,7 +74,8 @@ impl LlamaRunner {
             .send()
             .map_err(|e| anyhow!("Errore richiesta HTTP: {}", e))?;
 
-        let reader = BufReader::new(response);
+        // Utilizziamo un buffer di capacità ridotta (128 byte) per forzare il flush immediato dei dati SSE (Zero-Buffering latency)
+        let reader = BufReader::with_capacity(128, response);
 
         for line in reader.lines() {
             // Verifica STOP (Fase 2 - Step 4)

@@ -34,6 +34,11 @@ impl TitanWindow {
                     self.state.is_generating = false;
                     ctx.request_repaint();
                 }
+                EngineEvent::ModelUnloaded => {
+                    self.state.output_text.push_str("\n[SYSTEM] Modello scaricato correttamente. VRAM liberata.\n");
+                    self.state.current_model = "Nessun modello caricato".to_string();
+                    ctx.request_repaint();
+                }
                 EngineEvent::Error(err) => {
                     self.state.output_text.push_str(&format!("\n[ERROR] {}", err));
                     self.state.is_generating = false;

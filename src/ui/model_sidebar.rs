@@ -44,6 +44,13 @@ pub fn show(ctx: &egui::Context, state: &mut TitanAppState) {
                 ui.add_space(10.0);
                 render_resource_indicator(ui, state);
                 ui.separator();
+                
+                // Pulsante per lo scaricamento manuale del modello (VRAM Cleanup)
+                ui.add_space(5.0);
+                if ui.button(egui::RichText::new("🛑 Spegni Motore (Libera VRAM)").color(egui::Color32::RED)).clicked() {
+                    let _ = state.tx_to_engine.send(EngineCommand::UnloadModel);
+                    state.current_model = "Nessun modello caricato".to_string();
+                }
             });
         });
 }

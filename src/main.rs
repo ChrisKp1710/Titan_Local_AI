@@ -38,7 +38,15 @@ fn main() -> anyhow::Result<()> {
                     }
                     let _ = tx_to_ui.send(EngineEvent::Finished);
                 }
+                EngineCommand::UnloadModel => {
+                    tracing::warn!("Engine: Richiesta scaricamento modello (Unload)");
+                    loaded_runner = None; // Innesca il tratto Drop e libera VRAM
+                    let _ = tx_to_ui.send(EngineEvent::ModelUnloaded);
+                }
                 EngineCommand::LoadModel(path) => {
+                    // RESET preventivo: distrugge il runner precedente PRIMA di allocare il nuovo
+                    loaded_runner = None;
+
                     // 1. Parsing metadati veloce (Zero-Memory)
                     match models::gguf_parser::parse_gguf_metadata(&path) {
                         Ok(meta) => {

@@ -8,6 +8,7 @@ pub enum EngineCommand {
         max_tokens: u32,
     },
     LoadModel(std::path::PathBuf),
+    UnloadModel,
     Stop,
 }
 
@@ -16,6 +17,7 @@ pub enum EngineEvent {
     NewToken(String),
     ModelMetadataLoaded(String),
     ModelLoadedSuccess(String),
+    ModelUnloaded,
     Finished,
     #[allow(dead_code)]
     Error(String),
